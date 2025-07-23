@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Deposit Calculator - Calculate Your Returns</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="background-animation">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+        <div class="floating-shape shape-4"></div>
+        <div class="floating-shape shape-5"></div>
+    </div>
+    
+    <div class="main-container">
+        <div class="container">
+            <div class="header">
+                <i class="fas fa-dollar-sign header-icon"></i>
+                <h1>Fixed Deposit Calculator</h1>
+                <p>Calculate your FD returns with compound interest</p>
+            </div>
+            
+            <div class="error-message" id="error"></div>
+            
+            <form class="calculator-form">
+                <div class="form-group">
+                    <label for="principal">
+                        <i class="fas fa-dollar-sign"></i>
+                        Principal Amount
+                    </label>
+                    <input 
+                        type="number" 
+                        id="principal" 
+                        placeholder="Enter principal amount"
+                        min="1"
+                        step="0.01"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="interestRate">
+                        <i class="fas fa-percentage"></i>
+                        Annual Interest Rate
+                    </label>
+                    <input 
+                        type="number" 
+                        id="interestRate" 
+                        placeholder="Enter interest rate (e.g., 6.5)"
+                        min="0.1"
+                        max="100"
+                        step="0.1"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="tenure">
+                        <i class="fas fa-calendar-alt"></i>
+                        Tenure (in years)
+                    </label>
+                    <input 
+                        type="number" 
+                        id="tenure" 
+                        placeholder="Enter tenure in years"
+                        min="1"
+                        max="50"
+                        step="0.5"
+                        required
+                    >
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" id="calculateButton" class="calculateButton">
+                        <i class="fas fa-calculator"></i>
+                        Calculate
+                    </button>
+                    <button type="button" id="resetButton" class="resetButton">
+                        <i class="fas fa-refresh"></i>
+                        Reset
+                    </button>
+                </div>
+            </form>
+            
+            <div id="result" class="result">
+                <div class="result-placeholder">Enter values and click Calculate</div>
+            </div>
+            
+            <div id="breakdown" class="breakdown" style="display: none;">
+                <!-- Breakdown details will be inserted here -->
+            </div>
+        </div>
+        
+        <div class="history-container" id="historySection" style="display: none;">
+            <div class="history-header">
+                <h3><i class="fas fa-history"></i> Calculation History</h3>
+                <button id="clearHistoryButton" class="clear-history">
+                    <i class="fas fa-trash"></i>
+                    Clear All
+                </button>
+            </div>
+            <div id="historyList" class="history-list">
+                <!-- History items will be inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <p>&copy; 2025 FD Calculator. Calculate your fixed deposit returns accurately.</p>
+    </footer>
+    
+    <script src="script.js" defer></script>
+</body>
+</html>
