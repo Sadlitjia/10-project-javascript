@@ -1,193 +1,326 @@
+// Password Generator Class
+class EnigmaticPasswordGenerator {
+  constructor() {
+    this.init();
+  }
 
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(amount);
-}
+  init() {
+    this.bindEvents();
+    this.updateLengthDisplay();
+  }
 
-function formatNumber(num) {
-    return new Intl.NumberFormat('en-US').format(num);
-}
+  bindEvents() {
+    // Length slider
+    const lengthSlider = document.getElementById("length");
+    lengthSlider.addEventListener("input", () => this.updateLengthDisplay());
 
-function validateInputs(principal, interestRate, tenure) {
-    const errors = [];
-    
-    if (isNaN(principal) || principal <= 0) {
-        errors.push('Principal amount must be a positive number');
+    // Generate button
+    const generateBtn = document.getElementById("generateBtn");
+    generateBtn.addEventListener("click", () => this.generatePassword());
+
+    // Copy button
+    const copyBtn = document.getElementById("copyBtn");
+    copyBtn.addEventListener("click", () => this.copyToClipboard());
+
+    // Checkbox changes
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => this.validateOptions());
+    });
+
+    // Generate password on Enter key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        this.generatePassword();
+      }
+    });
+  }
+
+  updateLengthDisplay() {
+    const lengthSlider = document.getElementById("length");
+    const lengthValue = document.getElementById("lengthValue");
+    lengthValue.textContent = lengthSlider.value;
+  }
+
+  validateOptions() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const anyChecked = Array.from(checkboxes).some((cb) => cb.checked);
+
+    if (!anyChecked) {
+      // Automatically check lowercase if no options are selected
+      document.getElementById("lowercase").checked = true;
     }
-    
-    if (isNaN(interestRate) || interestRate <= 0 || interestRate > 100) {
-        errors.push('Interest rate must be between 0.1% and 100%');
+  }
+
+  generatePassword() {
+    const length = parseInt(document.getElementById("length").value);
+    const includeUppercase = document.getElementById("uppercase").checked;
+    const includeLowercase = document.getElementById("lowercase").checked;
+    const includeNumbers = document.getElementById("numbers").checked;
+    const includeSymbols = document.getElementById("symbols").checked;
+
+    // Character sets
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+    let availableChars = "";
+    let requiredChars = "";
+
+    // Build character set and ensure at least one character from each selected type
+    if (includeUppercase) {
+      availableChars += uppercase;
+      requiredChars += this.getRandomChar(uppercase);
     }
-    
-    if (isNaN(tenure) || tenure <= 0 || tenure > 50) {
-        errors.push('Tenure must be between 1 and 50 years');
+    if (includeLowercase) {
+      availableChars += lowercase;
+      requiredChars += this.getRandomChar(lowercase);
     }
-    
-    return errors;
-}
-
-function showError(message) {
-    const errorDiv = document.getElementById('error');
-    errorDiv.textContent = message;
-    errorDiv.style.display = 'block';
-    setTimeout(() => {
-        errorDiv.style.display = 'none';
-    }, 5000);
-}
-
-function addToHistory(principal, interestRate, tenure, maturityAmount, totalInterest) {
-    const historyList = document.getElementById('historyList');
-    const historyItem = document.createElement('div');
-    historyItem.className = 'history-item';
-    
-    const date = new Date().toLocaleDateString();
-    historyItem.innerHTML = `
-        <div class="history-header">
-            <span class="history-date">${date}</span>
-            <button class="delete-history" onclick="deleteHistoryItem(this)">×</button>
-        </div>
-        <div class="history-details">
-            <small>Principal: ${formatCurrency(principal)} | Rate: ${interestRate}% | Tenure: ${tenure} years</small>
-            <div><strong>Maturity: ${formatCurrency(maturityAmount)}</strong></div>
-        </div>
-    `;
-    
-    historyList.insertBefore(historyItem, historyList.firstChild);
-    
-    // Limit history to 10 items
-    while (historyList.children.length > 10) {
-        historyList.removeChild(historyList.lastChild);
+    if (includeNumbers) {
+      availableChars += numbers;
+      requiredChars += this.getRandomChar(numbers);
     }
-    
-    // Show history section
-    document.getElementById('historySection').style.display = 'block';
-}
-
-function deleteHistoryItem(button) {
-    const historyItem = button.closest('.history-item');
-    historyItem.remove();
-    
-    // Hide history section if no items
-    const historyList = document.getElementById('historyList');
-    if (historyList.children.length === 0) {
-        document.getElementById('historySection').style.display = 'none';
+    if (includeSymbols) {
+      availableChars += symbols;
+      requiredChars += this.getRandomChar(symbols);
     }
-}
 
-function clearHistory() {
-    document.getElementById('historyList').innerHTML = '';
-    document.getElementById('historySection').style.display = 'none';
-}
-
-function calculateMaturityAmount() {
-    // Hide previous error
-    document.getElementById('error').style.display = 'none';
-    
-    const principal = parseFloat(document.getElementById('principal').value);
-    const interestRate = parseFloat(document.getElementById('interestRate').value);
-    const tenure = parseFloat(document.getElementById('tenure').value);
-    
-    // Validate inputs
-    const errors = validateInputs(principal, interestRate, tenure);
-    if (errors.length > 0) {
-        showError(errors.join('. '));
-        return;
+    if (availableChars === "") {
+      this.showError("Please select at least one character type");
+      return;
     }
-    
-    // Calculate using compound interest formula: A = P(1 + r/100)^t
-    const maturityAmount = principal * Math.pow((1 + interestRate / 100), tenure);
-    const totalInterest = maturityAmount - principal;
-    
-    // Update result display with animation
-    const resultDiv = document.getElementById('result');
-    const breakdownDiv = document.getElementById('breakdown');
-    
-    resultDiv.innerHTML = `
-        <div class="result-main">
-            <div class="result-label">Maturity Amount</div>
-            <div class="result-amount">${formatCurrency(maturityAmount)}</div>
-        </div>
-    `;
-    
-    breakdownDiv.innerHTML = `
-        <div class="breakdown-item">
-            <span>Principal Amount:</span>
-            <span>${formatCurrency(principal)}</span>
-        </div>
-        <div class="breakdown-item">
-            <span>Total Interest Earned:</span>
-            <span class="interest-earned">${formatCurrency(totalInterest)}</span>
-        </div>
-        <div class="breakdown-item">
-            <span>Interest Rate:</span>
-            <span>${interestRate}% per year</span>
-        </div>
-        <div class="breakdown-item">
-            <span>Tenure:</span>
-            <span>${tenure} year${tenure > 1 ? 's' : ''}</span>
-        </div>
-        <div class="breakdown-item total">
-            <span><strong>Total Maturity Amount:</strong></span>
-            <span><strong>${formatCurrency(maturityAmount)}</strong></span>
-        </div>
-    `;
-    
-    // Show breakdown section
-    breakdownDiv.style.display = 'block';
-    
-    // Add to history
-    addToHistory(principal, interestRate, tenure, maturityAmount, totalInterest);
-    
-    // Add success animation
-    resultDiv.classList.add('animate-result');
-    setTimeout(() => {
-        resultDiv.classList.remove('animate-result');
-    }, 600);
-}
 
-function resetCalculator() {
-    document.getElementById('principal').value = '';
-    document.getElementById('interestRate').value = '';
-    document.getElementById('tenure').value = '';
-    document.getElementById('result').innerHTML = '<div class="result-placeholder">Enter values and click Calculate</div>';
-    document.getElementById('breakdown').style.display = 'none';
-    document.getElementById('error').style.display = 'none';
-}
+    // Generate password
+    let password = requiredChars;
 
-// Event listeners
-document.getElementById('calculateButton').addEventListener('click', calculateMaturityAmount);
-document.getElementById('resetButton').addEventListener('click', resetCalculator);
-document.getElementById('clearHistoryButton').addEventListener('click', clearHistory);
-
-// Enter key support
-document.addEventListener('keypress', function(event) {
-    if (event.key === 'Enter') {
-        calculateMaturityAmount();
+    // Fill remaining length with random characters
+    for (let i = password.length; i < length; i++) {
+      password += this.getRandomChar(availableChars);
     }
-});
 
-// Add input formatting
-document.getElementById('principal').addEventListener('input', function(e) {
-    const value = e.target.value.replace(/[^0-9.]/g, '');
-    e.target.value = value;
-});
+    // Shuffle the password to avoid predictable patterns
+    password = this.shuffleString(password);
 
-document.getElementById('interestRate').addEventListener('input', function(e) {
-    const value = e.target.value.replace(/[^0-9.]/g, '');
-    if (parseFloat(value) > 100) {
-        e.target.value = '100';
+    // Display the password
+    const passwordResult = document.getElementById("passwordResult");
+    passwordResult.value = password;
+
+    // Update strength meter
+    this.updateStrengthMeter(password);
+
+    // Add generation animation
+    this.animateGeneration();
+  }
+
+  getRandomChar(str) {
+    return str.charAt(Math.floor(Math.random() * str.length));
+  }
+
+  shuffleString(str) {
+    const arr = str.split("");
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr.join("");
+  }
+
+  updateStrengthMeter(password) {
+    const strengthIndicator = document.getElementById("strengthIndicator");
+    const strengthText = document.getElementById("strengthText");
+
+    const strength = this.calculatePasswordStrength(password);
+
+    // Remove existing strength classes
+    strengthIndicator.className = "strength-fill";
+    strengthText.className = "strength-text";
+
+    let strengthClass, strengthTextContent, strengthWidth;
+
+    if (strength < 30) {
+      strengthClass = "strength-weak";
+      strengthTextContent = "Weak";
+      strengthWidth = "25%";
+    } else if (strength < 60) {
+      strengthClass = "strength-medium";
+      strengthTextContent = "Medium";
+      strengthWidth = "50%";
+    } else if (strength < 80) {
+      strengthClass = "strength-strong";
+      strengthTextContent = "Strong";
+      strengthWidth = "75%";
     } else {
-        e.target.value = value;
+      strengthClass = "strength-very-strong";
+      strengthTextContent = "Very Strong";
+      strengthWidth = "100%";
     }
-});
 
-document.getElementById('tenure').addEventListener('input', function(e) {
-    const value = e.target.value.replace(/[^0-9.]/g, '');
-    if (parseFloat(value) > 50) {
-        e.target.value = '50';
-    } else {
-        e.target.value = value;
+    strengthIndicator.classList.add(strengthClass);
+    strengthText.classList.add(strengthClass);
+    strengthText.textContent = strengthTextContent;
+
+    // Animate the strength bar
+    setTimeout(() => {
+      strengthIndicator.style.width = strengthWidth;
+    }, 100);
+  }
+
+  calculatePasswordStrength(password) {
+    let score = 0;
+
+    // Length bonus
+    score += Math.min(password.length * 2, 25);
+
+    // Character variety bonus
+    const hasLower = /[a-z]/.test(password);
+    const hasUpper = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSymbol = /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password);
+
+    const varietyCount = [hasLower, hasUpper, hasNumber, hasSymbol].filter(
+      Boolean
+    ).length;
+    score += varietyCount * 10;
+
+    // Length penalties/bonuses
+    if (password.length < 8) score -= 10;
+    if (password.length >= 12) score += 5;
+    if (password.length >= 16) score += 5;
+
+    // Complexity bonus
+    if (varietyCount >= 3) score += 15;
+    if (varietyCount === 4) score += 10;
+
+    return Math.min(score, 100);
+  }
+
+  async copyToClipboard() {
+    const passwordResult = document.getElementById("passwordResult");
+    const copyBtn = document.getElementById("copyBtn");
+
+    if (!passwordResult.value) {
+      this.showError("Generate a password first");
+      return;
     }
+
+    try {
+      await navigator.clipboard.writeText(passwordResult.value);
+
+      // Visual feedback
+      copyBtn.classList.add("copy-success");
+      const icon = copyBtn.querySelector("i");
+      const originalClass = icon.className;
+      icon.className = "fas fa-check";
+
+      setTimeout(() => {
+        copyBtn.classList.remove("copy-success");
+        icon.className = originalClass;
+      }, 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      passwordResult.select();
+      document.execCommand("copy");
+      this.showSuccess("Password copied to clipboard!");
+    }
+  }
+
+  animateGeneration() {
+    const generateBtn = document.getElementById("generateBtn");
+    const icon = generateBtn.querySelector("i");
+
+    icon.style.animation = "none";
+    icon.offsetHeight; // Trigger reflow
+    icon.style.animation = "spin 0.5s ease-in-out";
+
+    setTimeout(() => {
+      icon.style.animation = "";
+    }, 500);
+  }
+
+  showError(message) {
+    this.showNotification(message, "error");
+  }
+
+  showSuccess(message) {
+    this.showNotification(message, "success");
+  }
+
+  showNotification(message, type) {
+    // Remove existing notifications
+    const existingNotification = document.querySelector(".notification");
+    if (existingNotification) {
+      existingNotification.remove();
+    }
+
+    // Create notification element
+    const notification = document.createElement("div");
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+            <i class="fas ${
+              type === "error" ? "fa-exclamation-circle" : "fa-check-circle"
+            }"></i>
+            <span>${message}</span>
+        `;
+
+    // Add styles
+    Object.assign(notification.style, {
+      position: "fixed",
+      top: "20px",
+      right: "20px",
+      background: type === "error" ? "#e53e3e" : "#38a169",
+      color: "white",
+      padding: "12px 20px",
+      borderRadius: "8px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+      zIndex: "10000",
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      fontSize: "14px",
+      fontWeight: "500",
+      opacity: "0",
+      transform: "translateY(-20px)",
+      transition: "all 0.3s ease",
+    });
+
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+      notification.style.opacity = "1";
+      notification.style.transform = "translateY(0)";
+    }, 10);
+
+    // Auto remove
+    setTimeout(() => {
+      notification.style.opacity = "0";
+      notification.style.transform = "translateY(-20px)";
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 300);
+    }, 3000);
+  }
+}
+
+// Add spin animation for the generate button icon
+const style = document.createElement("style");
+style.textContent = `
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize the password generator when DOM is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  new EnigmaticPasswordGenerator();
+
+  // Generate an initial password
+  setTimeout(() => {
+    document.getElementById("generateBtn").click();
+  }, 500);
 });

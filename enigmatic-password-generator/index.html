@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixed Deposit Calculator - Calculate Your Returns</title>
+    <title>Enigmatic Password Generator - Secure Password Creation</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -20,99 +20,88 @@
     <div class="main-container">
         <div class="container">
             <div class="header">
-                <i class="fas fa-dollar-sign header-icon"></i>
+                <i class="fas fa-key header-icon"></i>
                 <h1>Enigmatic Password Generator</h1>
                 <p>Generate secure and random passwords effortlessly</p>
             </div>
-            
-            <div class="error-message" id="error"></div>
-            
-            <form class="calculator-form">
-                <div class="form-group">
-                    <label for="principal">
-                        <i class="fas fa-dollar-sign"></i>
-                        Principal Amount
-                    </label>
-                    <input 
-                        type="number" 
-                        id="principal" 
-                        placeholder="Enter principal amount"
-                        min="1"
-                        step="0.01"
-                        required
-                    >
-                </div>
-                
-                <div class="form-group">
-                    <label for="interestRate">
-                        <i class="fas fa-percentage"></i>
-                        Annual Interest Rate
-                    </label>
-                    <input 
-                        type="number" 
-                        id="interestRate" 
-                        placeholder="Enter interest rate (e.g., 6.5)"
-                        min="0.1"
-                        max="100"
-                        step="0.1"
-                        required
-                    >
-                </div>
-                
-                <div class="form-group">
-                    <label for="tenure">
-                        <i class="fas fa-calendar-alt"></i>
-                        Tenure (in years)
-                    </label>
-                    <input 
-                        type="number" 
-                        id="tenure" 
-                        placeholder="Enter tenure in years"
-                        min="1"
-                        max="50"
-                        step="0.5"
-                        required
-                    >
-                </div>
-                
-                <div class="button-group">
-                    <button type="button" id="calculateButton" class="calculateButton">
-                        <i class="fas fa-calculator"></i>
-                        Calculate
+
+            <div class="generator-container">
+                <div class="options-section">
+                    <div class="option-group">
+                        <label for="length">Password Length:</label>
+                        <div class="length-control">
+                            <input type="range" id="length" min="4" max="50" value="12">
+                            <span id="lengthValue">12</span>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="uppercase" checked>
+                            <label for="uppercase">
+                                <i class="fas fa-font"></i>
+                                Uppercase Letters (A-Z)
+                            </label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lowercase" checked>
+                            <label for="lowercase">
+                                <i class="fas fa-font"></i>
+                                Lowercase Letters (a-z)
+                            </label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="numbers" checked>
+                            <label for="numbers">
+                                <i class="fas fa-hashtag"></i>
+                                Numbers (0-9)
+                            </label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="symbols" checked>
+                            <label for="symbols">
+                                <i class="fas fa-at"></i>
+                                Symbols (!@#$%^&*)
+                            </label>
+                        </div>
+                        </div>
+                        </div>
+                        
+                        <div class="generator-section">
+                            <button id="generateBtn" class="generate-btn">
+                                <i class="fas fa-magic"></i>
+                                Generate Password
                     </button>
-                    <button type="button" id="resetButton" class="resetButton">
-                        <i class="fas fa-refresh"></i>
-                        Reset
-                    </button>
-                </div>
-            </form>
-            
-            <div id="result" class="result">
-                <div class="result-placeholder">Enter values and click Calculate</div>
-            </div>
-            
-            <div id="breakdown" class="breakdown" style="display: none;">
-                <!-- Breakdown details will be inserted here -->
-            </div>
-        </div>
-        
-        <div class="history-container" id="historySection" style="display: none;">
-            <div class="history-header">
-                <h3><i class="fas fa-history"></i> Calculation History</h3>
-                <button id="clearHistoryButton" class="clear-history">
-                    <i class="fas fa-trash"></i>
-                    Clear All
-                </button>
-            </div>
-            <div id="historyList" class="history-list">
-                <!-- History items will be inserted here -->
+<div class="password-output">
+    <div class="password-field">
+        <input type="text" id="passwordResult" readonly placeholder="Your secure password will appear here...">
+        <button id="copyBtn" class="copy-btn" title="Copy to clipboard">
+            <i class="fas fa-copy"></i>
+        </button>
+    </div>
+                    </div>
+
+                    <div class="strength-meter">
+                        <div class="strength-label">Password Strength:</div>
+                        <div class="strength-bar">
+                            <div id="strengthIndicator" class="strength-fill"></div>
+                        </div>
+                        <div id="strengthText" class="strength-text">Click generate to check</div>
+                        </div>
+                        </div>
+                        </div>
+
+            <div class="tips-section">
+                <h3><i class="fas fa-lightbulb"></i> Password Security Tips</h3>
+                <ul>
+                    <li>Use at least 12 characters for better security</li>
+                    <li>Include a mix of uppercase, lowercase, numbers, and symbols</li>
+                    <li>Don't use personal information or common words</li>
+                    <li>Use unique passwords for different accounts</li>
+                </ul>
             </div>
         </div>
     </div>
-    
-    <footer class="footer">
-        <p>&copy; 2025 FD Calculator. Calculate your fixed deposit returns accurately.</p>
-    </footer>
     
     <script src="script.js" defer></script>
 </body>
