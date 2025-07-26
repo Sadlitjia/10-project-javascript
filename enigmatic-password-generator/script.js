@@ -12,7 +12,14 @@ class EnigmaticPasswordGenerator {
   bindEvents() {
     // Length slider
     const lengthSlider = document.getElementById("length");
-    lengthSlider.addEventListener("input", () => this.updateLengthDisplay());
+    lengthSlider.addEventListener("input", () => {
+      this.updateLengthDisplay();
+      // Update strength if password exists
+      const currentPassword = document.getElementById("passwordResult").value;
+      if (currentPassword) {
+        this.updateStrengthMeter(currentPassword);
+      }
+    });
 
     // Generate button
     const generateBtn = document.getElementById("generateBtn");
@@ -25,7 +32,14 @@ class EnigmaticPasswordGenerator {
     // Checkbox changes
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener("change", () => this.validateOptions());
+      checkbox.addEventListener("change", () => {
+        this.validateOptions();
+        // Update strength if password exists
+        const currentPassword = document.getElementById("passwordResult").value;
+        if (currentPassword) {
+          this.updateStrengthMeter(currentPassword);
+        }
+      });
     });
 
     // Generate password on Enter key
@@ -130,6 +144,14 @@ class EnigmaticPasswordGenerator {
     const strengthIndicator = document.getElementById("strengthIndicator");
     const strengthText = document.getElementById("strengthText");
 
+    if (!password) {
+      strengthIndicator.style.width = "0%";
+      strengthIndicator.className = "strength-fill";
+      strengthText.textContent = "Click generate to check";
+      strengthText.className = "strength-text";
+      return;
+    }
+
     const strength = this.calculatePasswordStrength(password);
 
     // Remove existing strength classes
@@ -156,43 +178,63 @@ class EnigmaticPasswordGenerator {
       strengthWidth = "100%";
     }
 
+    // Add strength classes
     strengthIndicator.classList.add(strengthClass);
     strengthText.classList.add(strengthClass);
     strengthText.textContent = strengthTextContent;
 
-    // Animate the strength bar
+    // Animate the strength bar with a slight delay for better visual effect
     setTimeout(() => {
       strengthIndicator.style.width = strengthWidth;
-    }, 100);
+    }, 150);
   }
 
   calculatePasswordStrength(password) {
+    if (!password) return 0;
+
     let score = 0;
 
-    // Length bonus
-    score += Math.min(password.length * 2, 25);
+    // Length scoring - more generous for longer passwords
+    if (password.length >= 4) score += 5;
+    if (password.length >= 6) score += 5;
+    if (password.length >= 8) score += 10;
+    if (password.length >= 12) score += 15;
+    if (password.length >= 16) score += 10;
+    if (password.length >= 20) score += 5;
 
-    // Character variety bonus
+    // Character variety scoring
     const hasLower = /[a-z]/.test(password);
     const hasUpper = /[A-Z]/.test(password);
     const hasNumber = /\d/.test(password);
     const hasSymbol = /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password);
 
-    const varietyCount = [hasLower, hasUpper, hasNumber, hasSymbol].filter(
-      Boolean
-    ).length;
-    score += varietyCount * 10;
+    const checks = [hasLower, hasUpper, hasNumber, hasSymbol];
+    const varietyCount = checks.filter(Boolean).length;
 
-    // Length penalties/bonuses
-    if (password.length < 8) score -= 10;
-    if (password.length >= 12) score += 5;
-    if (password.length >= 16) score += 5;
+    // Variety bonuses
+    if (hasLower) score += 5;
+    if (hasUpper) score += 5;
+    if (hasNumber) score += 5;
+    if (hasSymbol) score += 10;
 
-    // Complexity bonus
-    if (varietyCount >= 3) score += 15;
-    if (varietyCount === 4) score += 10;
+    // Combination bonuses
+    if (varietyCount >= 2) score += 5;
+    if (varietyCount >= 3) score += 10;
+    if (varietyCount === 4) score += 15;
 
-    return Math.min(score, 100);
+    // Additional complexity checks
+    const uniqueChars = new Set(password).size;
+    const uniqueRatio = uniqueChars / password.length;
+    
+    if (uniqueRatio > 0.7) score += 5; // High character diversity
+    if (uniqueRatio > 0.9) score += 5; // Very high character diversity
+
+    // Penalty for very short passwords
+    if (password.length < 6) score -= 10;
+    if (password.length < 4) score -= 20;
+
+    // Ensure score is between 0 and 100
+    return Math.max(0, Math.min(100, score));
   }
 
   async copyToClipboard() {

@@ -337,50 +337,70 @@ body {
 /* Strength Meter */
 .strength-meter {
     text-align: left;
+    margin-top: 20px;
 }
 
 .strength-label {
     font-weight: 600;
     color: #2d3748;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+        font-size: 1rem;
 }
 
 .strength-bar {
     width: 100%;
-    height: 8px;
+    height: 10px;
     background: #e2e8f0;
-    border-radius: 4px;
+    border-radius: 5px;
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .strength-fill {
     height: 100%;
-    transition: all 0.3s ease;
+    width: 0%;
+        transition: all 0.5s ease;
     border-radius: 4px;
+    background: #e2e8f0;
 }
 
 .strength-text {
     font-size: 0.9rem;
     font-weight: 500;
+    color: #4a5568;
 }
 
-.strength-weak {
+/* Strength Fill Colors */
+.strength-fill.strength-weak {
     background: #e53e3e;
+}
+
+.strength-fill.strength-medium {
+    background: #dd6b20;
+}
+
+.strength-fill.strength-strong {
+    background: #38a169;
+}
+
+.strength-fill.strength-very-strong {
+    background: linear-gradient(45deg, #38a169, #3182ce);
+}
+
+/* Strength Text Colors */
+.strength-text.strength-weak {
     color: #e53e3e;
 }
 
-.strength-medium {
-    background: #dd6b20;
+.strength-text.strength-medium {
     color: #dd6b20;
 }
 
-.strength-strong {
-    background: #38a169;
+.strength-text.strength-strong {
     color: #38a169;
 }
-.strength-very-strong {
-    background: #3182ce;
+.strength-text.strength-very-strong {
     color: #3182ce;
 }
 /* Tips Section */
@@ -471,10 +491,12 @@ body {
             font-size: 0.9rem;
         }
         }
+
 /* Copy success animation */
 .copy-success {
     background: #38a169 !important;
 }
+
 .copy-success i::before {
     content: "\f00c" !important;
 }
